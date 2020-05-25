@@ -1,24 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ObstacleSpawner : MonoBehaviour
 {
     // ObstacleSpawner Components
+    [SerializeField]
     private int minSpawnDistance = 5;
+    [SerializeField]
     private int maxSpawnDistance = 10;
-    private static int ArrayLength = 6;
+    private static int arrayLength = 6;
+    [SerializeField]
     private int maxObstacles = 10;
+    [SerializeField]
     private float safeZone = 10f;
+    [SerializeField]
     private static float spawnX = 0;
+    [SerializeField]
     private static float spawnY = -2.28f;
+    [SerializeField]
     private static float spawnZ = 0;
-
-    private float deletePosition;
 
     Vector3 SpawnVector = new Vector3(spawnX, spawnY, spawnZ);
 
-    public GameObject[] PrefabsArray = new GameObject[ArrayLength];
+    public GameObject[] PrefabsArray = new GameObject[arrayLength];
     private List<GameObject> ActiveObstaclesList = new List<GameObject>();
 
     //Camera Components
@@ -32,6 +38,7 @@ public class ObstacleSpawner : MonoBehaviour
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         cameraTransform = mainCamera.GetComponent<Transform>();
         cameraWidth = Camera.main.orthographicSize * 2;
+
         for (int i = 0; i < maxObstacles; i++)
         {
             SpawnObstacle();
@@ -41,6 +48,7 @@ public class ObstacleSpawner : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        // Obstacles in scene manager
         float deletePosition = (cameraTransform.position.x - (cameraWidth / 2) - safeZone);
         if (ActiveObstaclesList[0].transform.position.x < deletePosition)
         {
@@ -51,11 +59,31 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void SpawnObstacle()
     {
-        GameObject obstacle = Instantiate(GetObstacleToSpawn()) as GameObject;
+        // Create and spawn object
+        GameObject obstacle = Instantiate(PrefabsArray[Random.Range(0, arrayLength - 1)]) as GameObject;
         obstacle.transform.parent = this.transform.parent;
-        SpawnVector.x += GetObstacleDistance();
-        obstacle.transform.position = SpawnVector;
-        ActiveObstaclesList.Add(obstacle);
+        float distance = Random.Range(minSpawnDistance, maxSpawnDistance);
+
+        // Check if collides with regen
+        Collider2D[] colliders = { new Collider2D() };
+        Vector3 checkSpawnCollision = SpawnVector;
+        checkSpawnCollision.x += distance;
+        int count = Physics2D.OverlapCircleNonAlloc(checkSpawnCollision, 3.0f, colliders);
+
+        // If collides, destroy and spawn again 1 unit further
+        if (count > 0)
+        {
+            SpawnVector.x += 1.0f;
+            Destroy(obstacle);
+            SpawnObstacle();
+            Debug.Log("Repairing spawn");
+        }
+        else
+        {
+            SpawnVector.x += distance;
+            obstacle.transform.position = SpawnVector;
+            ActiveObstaclesList.Add(obstacle);
+        }
     }
 
     private void DeleteObstacle()
@@ -63,15 +91,5 @@ public class ObstacleSpawner : MonoBehaviour
         GameObject obstacle = ActiveObstaclesList[0];
         Destroy(obstacle);
         ActiveObstaclesList.RemoveAt(0);
-    }
-
-    private Object GetObstacleToSpawn()
-    {
-        return PrefabsArray[Random.Range(0, ArrayLength - 1)];
-    }
-
-    private float GetObstacleDistance()
-    {
-        return Random.Range(minSpawnDistance, maxSpawnDistance);
     }
 }

@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        PlayerScript.ChangeHealth(PlayerScript.GetHpLossRate());
+        // Health drainer
+        PlayerScript.ChangeHealth(PlayerScript.hpLossRate);
     }
 }

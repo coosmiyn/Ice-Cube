@@ -11,29 +11,17 @@ public class PlayerScript : MonoBehaviour
     private bool jump = false;
 
     // hp
-    private float health = 100f;
     private float minHealth = 0f;
     private float maxHealth = 100f;
-    private float hpLossRate = 0.1f;
+    private float _health = 100f;
+    private float _hpLossRate = 0.1f;
 
-    public float GetHpLossRate()
-    {
-        return hpLossRate;
-    }
-
-    public void SetHpLossRate(float value)
-    {
-        hpLossRate = value;
-    }
+    // public vars
+    public float health { get { return _health; } set { _health = value; } }
+    public float hpLossRate { get { return _hpLossRate; } set { _hpLossRate = value; } }
 
     // Player Components
     public CharacterController2D controller;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
     void Update()
@@ -53,17 +41,18 @@ public class PlayerScript : MonoBehaviour
 
     public void ChangeHealth(float rate)
     {
-        health -= rate;
-        if (health > maxHealth)
+        _health -= rate;
+        if (_health > maxHealth)
         {
-            health = maxHealth;
+            _health = maxHealth;
         }
-        else if (health < minHealth)
+        else if (_health < minHealth)
         {
-            health = minHealth;
+            _health = minHealth;
         }
     }
 
+    // Return string HP for display
     public string GetHealth()
     {
         var healthInt = (int)health;

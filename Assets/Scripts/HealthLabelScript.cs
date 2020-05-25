@@ -23,6 +23,7 @@ public class HealthLabelScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        // Health display
         HealthText.text = PlayerScript.GetHealth();
     }
 }

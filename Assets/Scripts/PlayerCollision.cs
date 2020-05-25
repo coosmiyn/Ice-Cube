@@ -20,14 +20,9 @@ public class PlayerCollision : MonoBehaviour
         CharacterController = Player.GetComponent<CharacterController2D>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // If collides with spike add force and disable air control
         if (collision.gameObject.tag == "Spike")
         {
             Debug.Log("hit spike");
@@ -47,11 +42,13 @@ public class PlayerCollision : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        PlayerScript.SetHpLossRate((PlayerScript.GetHpLossRate() * -1) * 2.5f);
+        // Entered regen trigger, update HP regen
+        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) * 2.5f;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        PlayerScript.SetHpLossRate((PlayerScript.GetHpLossRate() * -1) / 2.5f);
+        // Exited regen trigger, update HP regen
+        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) / 2.5f;
     }
 }

@@ -19,6 +19,7 @@ public class CameraScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        // Camera movement
         Transform.Translate(Vector3.right * Time.deltaTime * cameraSpeed);
     }
 

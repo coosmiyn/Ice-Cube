@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7349526755737536939}
   - component: {fileID: 7349526755737536938}
   - component: {fileID: 7349526755737536932}
-  - component: {fileID: -29365077582748719}
   m_Layer: 0
   m_Name: spike2
   m_TagString: Spike
@@ -47,6 +46,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -103,15 +103,3 @@ EdgeCollider2D:
   - {x: -0.019228797, y: -0.021669522}
   - {x: 0.6366907, y: 0.45308927}
   - {x: 1.3275976, y: -0.6375278}
---- !u!114 &-29365077582748719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7349526755737536937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f19022b9c96856e498112a4f7c056f42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
