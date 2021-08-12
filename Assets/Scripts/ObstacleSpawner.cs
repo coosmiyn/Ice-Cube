@@ -18,7 +18,7 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField]
     private static float spawnX = 0;
     [SerializeField]
-    private static float spawnY = -2.28f;
+    private static float spawnY = -2.075f;
     [SerializeField]
     private static float spawnZ = 0;
 
@@ -64,26 +64,30 @@ public class ObstacleSpawner : MonoBehaviour
         obstacle.transform.parent = this.transform.parent;
         float distance = Random.Range(minSpawnDistance, maxSpawnDistance);
 
-        // Check if collides with regen
-        Collider2D[] colliders = { new Collider2D() };
-        Vector3 checkSpawnCollision = SpawnVector;
-        checkSpawnCollision.x += distance;
-        int count = Physics2D.OverlapCircleNonAlloc(checkSpawnCollision, 3.0f, colliders);
+        SpawnVector.x += distance;
+        obstacle.transform.position = SpawnVector;
+        ActiveObstaclesList.Add(obstacle);
 
-        // If collides, destroy and spawn again 1 unit further
-        if (count > 0)
-        {
-            SpawnVector.x += 1.0f;
-            Destroy(obstacle);
-            SpawnObstacle();
-            Debug.Log("Repairing spawn");
-        }
-        else
-        {
-            SpawnVector.x += distance;
-            obstacle.transform.position = SpawnVector;
-            ActiveObstaclesList.Add(obstacle);
-        }
+        //// Check if collides with regen
+        //Collider2D[] colliders = { new Collider2D() };
+        //Vector3 checkSpawnCollision = SpawnVector;
+        //checkSpawnCollision.x += distance;
+        //int count = Physics2D.OverlapCircleNonAlloc(checkSpawnCollision, 3.0f, colliders);
+
+        //// If collides, destroy and spawn again 1 unit further
+        //if (count > 0)
+        //{
+        //    SpawnVector.x += 1.0f;
+        //    Destroy(obstacle);
+        //    SpawnObstacle();
+        //    Debug.Log("Repairing spawn");
+        //}
+        //else
+        //{
+        //    SpawnVector.x += distance;
+        //    obstacle.transform.position = SpawnVector;
+        //    ActiveObstaclesList.Add(obstacle);
+        //}
     }
 
     private void DeleteObstacle()

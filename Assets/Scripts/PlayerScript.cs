@@ -1,36 +1,46 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerScript : MonoBehaviour
 {
 
     // movement stats
-    private float runSpeed = 145f;
-    private float horizontalMove = 0f;
+    private float horizontalMove = 0.0f;
     private bool jump = false;
-
-    // hp
-    private float minHealth = 0f;
-    private float maxHealth = 100f;
-    private float _health = 100f;
-    private float _hpLossRate = 0.1f;
+    private float _health { get; set; } = 100;
 
     // public vars
-    public float health { get { return _health; } set { _health = value; } }
-    public float hpLossRate { get { return _hpLossRate; } set { _hpLossRate = value; } }
+    public float health { get {  return _health; } }
+    public float hpLossRate { get; set; } = 0.1f;
+    public bool isGrunded { get; set; } = false;
+    public float runSpeed { get; set; } = 100.0f;
+    public float defaultRunSpeed { get; } = 145.0f;
+
+    public Joystick joystick;
 
     // Player Components
     public CharacterController2D controller;
+    public Rigidbody2D RigidBody;
 
     // Update is called once per frame
     void Update()
     {
-        horizontalMove = Input.GetAxis("Horizontal") * runSpeed;
-        if (Input.GetButtonDown("Jump"))
-        {
-            jump = true;
-        }
+        if (joystick.Horizontal >= 0.2f)
+            horizontalMove = joystick.Horizontal * runSpeed;
+        else if (joystick.Horizontal <= 0.2f)
+            horizontalMove = joystick.Horizontal * runSpeed;
+        else
+            horizontalMove = 0;
+
+        //float verticalMove = joystick.Vertical;
+
+        //if (verticalMove >= 0.35f)
+        //{
+        //    jump = true;
+        //    isGrunded = false;
+        //}
     }
 
     void FixedUpdate()
@@ -42,14 +52,15 @@ public class PlayerScript : MonoBehaviour
     public void ChangeHealth(float rate)
     {
         _health -= rate;
-        if (_health > maxHealth)
-        {
-            _health = maxHealth;
-        }
-        else if (_health < minHealth)
-        {
-            _health = minHealth;
-        }
+        _health = Mathf.Clamp(health, 0, 100);
+
+        if (health == 0)
+            Die();
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _health -= damage;
     }
 
     // Return string HP for display
@@ -57,5 +68,16 @@ public class PlayerScript : MonoBehaviour
     {
         var healthInt = (int)health;
         return healthInt.ToString();
+    }
+
+    public void Die()
+    {
+        Scene scene = SceneManager.GetActiveScene(); 
+        SceneManager.LoadScene(scene.name);
+    }
+
+    public void Jump()
+    {
+        jump = true;
     }
 }

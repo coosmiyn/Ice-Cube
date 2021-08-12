@@ -25,6 +25,7 @@ public class RegenSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //yield return new WaitForSeconds(1.0f);
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         cameraTransform = mainCamera.GetComponent<Transform>();
         cameraWidth = Camera.main.orthographicSize * 2;
@@ -53,9 +54,30 @@ public class RegenSpawner : MonoBehaviour
         GameObject regen = Instantiate(PrefabsArray[0]) as GameObject;
         regen.transform.SetParent(this.transform);
         float distance = Random.Range(minRegenDistance, maxRegenDistance);
-        SpawnVector.x += distance;
-        regen.transform.position = SpawnVector;
-        ActiveRegenList.Add(regen);
+
+        // Check if collides with regen
+        Collider2D[] colliders = { new Collider2D() };
+        Vector3 checkSpawnCollision = SpawnVector;
+        checkSpawnCollision.x += distance;
+        int count = Physics2D.OverlapCircleNonAlloc(checkSpawnCollision, 3.0f, colliders);
+
+        // If collides, destroy and spawn again 1 unit further
+        if (count > 0)
+        {
+            SpawnVector.x += 1.0f;
+            Destroy(regen);
+            SpawnRegen();
+        }
+        else
+        {
+            SpawnVector.x += distance;
+            regen.transform.position = SpawnVector;
+            ActiveRegenList.Add(regen);
+        }
+
+        //SpawnVector.x += distance;
+        //regen.transform.position = SpawnVector;
+        //ActiveRegenList.Add(regen);
     }
 
     void DeleteRegen()

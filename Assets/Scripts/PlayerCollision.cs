@@ -5,6 +5,16 @@ using UnityEngine;
 
 public class PlayerCollision : MonoBehaviour
 {
+    // Stats
+    [SerializeField]
+    float regenRate = 2.0f;
+    [SerializeField]
+    float spikeDamage = 5.0f;
+    [SerializeField]
+    float spikeForceX = -250.0f;
+    [SerializeField]
+    float spikeForceY = 250.0f;
+
     // Player Components
     GameObject Player;
     PlayerScript PlayerScript;
@@ -25,13 +35,21 @@ public class PlayerCollision : MonoBehaviour
         // If collides with spike add force and disable air control
         if (collision.gameObject.tag == "Spike")
         {
-            Debug.Log("hit spike");
-            RigidBody.AddForce(new Vector2(-250, 250));
+            // Add force and disable air control until it reaches the ground
+            RigidBody.velocity = Vector3.zero;
+            RigidBody.angularVelocity = 0.0f;
+            //PlayerScript.runSpeed = 0.0f;
             CharacterController.m_AirControl = false;
-            Timer timer = new Timer();
-            timer.Interval = 2000;
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
+
+            PlayerScript.TakeDamage(spikeDamage);
+            RigidBody.AddForce(new Vector2(spikeForceX, spikeForceY));
+            //StartCoroutine(Wait(0.1f));
+        }
+        else if (collision.gameObject.tag == "Ground")
+        {
+            PlayerScript.isGrunded = true;
+            CharacterController.m_AirControl = true;
+            PlayerScript.runSpeed = PlayerScript.defaultRunSpeed;
         }
     }
 
@@ -43,12 +61,17 @@ public class PlayerCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Entered regen trigger, update HP regen
-        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) * 2.5f;
+        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) * regenRate;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         // Exited regen trigger, update HP regen
-        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) / 2.5f;
+        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) / regenRate;
+    }
+
+    IEnumerator Wait(float value)
+    {
+        yield return new WaitForSeconds(value);
     }
 }
