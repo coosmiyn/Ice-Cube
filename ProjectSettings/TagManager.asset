@@ -8,11 +8,14 @@ TagManager:
   - RegenObject
   - GameManager
   - Spike
+  - PowerUpInvincible
+  - PowerUpRegen
+  - Fire
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - 

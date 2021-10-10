@@ -6,16 +6,14 @@ public class TerrainController : MonoBehaviour
 {
     // Spawner stats
     public static int tilesArrayNumber = 1;
-    public float maxTiles = 20f;
+    [SerializeField]  public float maxTiles = 20f;
     private float tileLength = 1f;
     private static float tileSpawnZ = 0f;
-    private static float tileSpawnY = -3f;
+    [SerializeField]  private static float tileSpawnY = -3f;
     private static float tileSpawnX = 0f;
-    public float safeZone = 15f;
-
+    [SerializeField]  public float safeZone = 15f;
     public GameObject[] tiles = new GameObject[tilesArrayNumber];
     List<GameObject> activeTerrain = new List<GameObject>();
-
     private Vector3 spawnVector = new Vector3(tileSpawnX, tileSpawnY, tileSpawnZ);
 
     // Camera components

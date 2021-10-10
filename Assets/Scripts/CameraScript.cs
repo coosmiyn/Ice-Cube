@@ -5,8 +5,8 @@ using UnityEngine;
 public class CameraScript : MonoBehaviour
 {
     // Camera stats
-    private float cameraSpeed = 6f;
-    private float safeZone = 10.0f;
+    [SerializeField] private float cameraSpeed = 6f;
+    [SerializeField] private float safeZone = 10.0f;
 
     // Camera components
     private Transform Transform;

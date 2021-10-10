@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 using System.Timers;
 using UnityEngine;
+using static Types;
 
 public class PlayerCollision : MonoBehaviour
 {
     // Stats
-    [SerializeField]
-    float regenRate = 2.0f;
-    [SerializeField]
-    float spikeDamage = 5.0f;
-    [SerializeField]
-    float spikeForceX = -250.0f;
-    [SerializeField]
-    float spikeForceY = 250.0f;
+    [SerializeField] float regenRate = 2.0f;
+    [SerializeField] float spikeDamage = 5.0f;
+    [SerializeField] float spikeForceX = -250.0f;
+    [SerializeField] float spikeForceY = 250.0f;
+    [SerializeField] float spikeDisableTime = 2.0f;
+    [SerializeField] float fireRegenTime = 2.0f;
 
     // Player Components
     GameObject Player;
-    PlayerScript PlayerScript;
+    PlayerScript playerScript;
     Rigidbody2D RigidBody;
     CharacterController2D CharacterController;
 
@@ -25,7 +24,7 @@ public class PlayerCollision : MonoBehaviour
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        PlayerScript = Player.GetComponent<PlayerScript>();
+        playerScript = Player.GetComponent<PlayerScript>();
         RigidBody = Player.GetComponent<Rigidbody2D>();
         CharacterController = Player.GetComponent<CharacterController2D>();
     }
@@ -35,21 +34,30 @@ public class PlayerCollision : MonoBehaviour
         // If collides with spike add force and disable air control
         if (collision.gameObject.tag == "Spike")
         {
-            // Add force and disable air control until it reaches the ground
-            RigidBody.velocity = Vector3.zero;
-            RigidBody.angularVelocity = 0.0f;
-            //PlayerScript.runSpeed = 0.0f;
-            CharacterController.m_AirControl = false;
+            if (!playerScript.isInvincible)
+            {
+                //// Add force and disable air control until it reaches the ground
+                //RigidBody.velocity = Vector3.zero;
+                //RigidBody.angularVelocity = 0.0f;
+                ////PlayerScript.runSpeed = 0.0f;
+                //CharacterController.m_AirControl = false;
 
-            PlayerScript.TakeDamage(spikeDamage);
-            RigidBody.AddForce(new Vector2(spikeForceX, spikeForceY));
-            //StartCoroutine(Wait(0.1f));
+                //playerScript.TakeDamage(spikeDamage);
+                ////RigidBody.AddForce(new Vector2(spikeForceX, spikeForceY));
+                //RigidBody.AddForce(new Vector2(spikeForceX, spikeForceY));
+                ////StartCoroutine(Wait(0.1f));
+                ///
+                CharacterController.m_AirControl = false;
+                playerScript.TakeDamage(spikeDamage);
+                RigidBody.AddForce(new Vector2(0, spikeForceY));
+                StartCoroutine(RegainAirControl(spikeDisableTime));
+            }
         }
         else if (collision.gameObject.tag == "Ground")
         {
-            PlayerScript.isGrunded = true;
+            playerScript.isGrunded = true;
             CharacterController.m_AirControl = true;
-            PlayerScript.runSpeed = PlayerScript.defaultRunSpeed;
+            //playerScript.runSpeed = playerScript.defaultRunSpeed;
         }
     }
 
@@ -61,13 +69,51 @@ public class PlayerCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Entered regen trigger, update HP regen
-        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) * regenRate;
+        switch(collision.tag)
+        {
+            case "RegenObject":
+                playerScript.hpLossRate = (playerScript.hpLossRate * -1) * regenRate;
+                break;
+            case "PowerUpInvincible":
+                StartCoroutine(playerScript.TriggerPowerUp(EPowerUps.Invincible, 5.0f));
+                Destroy(collision.gameObject);
+                break;
+            case "PowerUpRegen":
+                StartCoroutine(playerScript.TriggerPowerUp(EPowerUps.Regen, 5.0f));
+                Destroy(collision.gameObject);
+                break;
+            case "Fire":
+                playerScript.hpLossRate = playerScript.fireHpLossRate;
+                StartCoroutine(RegainHPRegen(fireRegenTime));
+                break;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         // Exited regen trigger, update HP regen
-        PlayerScript.hpLossRate = (PlayerScript.hpLossRate * -1) / regenRate;
+        switch (collision.tag)
+        {
+            case "RegenObject":
+                playerScript.hpLossRate = (playerScript.hpLossRate * -1) / regenRate;
+                break;
+            case "Fire":
+                //playerScript.hpLossRate = playerScript.defaultHpLossRate;
+                break;
+        }
+    }
+
+    IEnumerator RegainAirControl(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        CharacterController.m_AirControl = true;
+        CharacterController.m_AirControl = true;
+    }
+
+    IEnumerator RegainHPRegen(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        playerScript.hpLossRate = playerScript.defaultHpLossRate;
     }
 
     IEnumerator Wait(float value)

@@ -6,26 +6,18 @@ using UnityEngine.Rendering;
 public class ObstacleSpawner : MonoBehaviour
 {
     // ObstacleSpawner Components
-    [SerializeField]
-    private int minSpawnDistance = 5;
-    [SerializeField]
-    private int maxSpawnDistance = 10;
-    private static int arrayLength = 6;
-    [SerializeField]
-    private int maxObstacles = 10;
-    [SerializeField]
-    private float safeZone = 10f;
-    [SerializeField]
-    private static float spawnX = 0;
-    [SerializeField]
-    private static float spawnY = -2.075f;
-    [SerializeField]
-    private static float spawnZ = 0;
-
+    [SerializeField] private int minSpawnDistance = 5;
+    [SerializeField] private int maxSpawnDistance = 10;
+    [SerializeField] private int maxObstacles = 10;
+    [SerializeField] private float safeZone = 10f;
+    [SerializeField] private static float spawnX = 0;
+    [SerializeField] private static float spawnY = -2.075f;
+    [SerializeField] private static float spawnZ = 0;
+    private static int arrayLength = 2;
     Vector3 SpawnVector = new Vector3(spawnX, spawnY, spawnZ);
-
     public GameObject[] PrefabsArray = new GameObject[arrayLength];
     private List<GameObject> ActiveObstaclesList = new List<GameObject>();
+    private List<List<GameObject>> ClampedObstacles = new List<List<GameObject>>();
 
     //Camera Components
     float cameraWidth;
@@ -41,7 +33,7 @@ public class ObstacleSpawner : MonoBehaviour
 
         for (int i = 0; i < maxObstacles; i++)
         {
-            SpawnObstacle();
+            SpawnSpike();
         }
     }
 
@@ -50,13 +42,47 @@ public class ObstacleSpawner : MonoBehaviour
     {
         // Obstacles in scene manager
         float deletePosition = (cameraTransform.position.x - (cameraWidth / 2) - safeZone);
-        if (ActiveObstaclesList[0].transform.position.x < deletePosition)
+        if (ClampedObstacles[0][0].transform.position.x < deletePosition)
         {
             DeleteObstacle();
-            SpawnObstacle();
+            SpawnSpike();
         }
     }
 
+
+    private void DeleteObstacle()
+    {
+        //GameObject obstacle = ActiveObstaclesList[0];
+        //Destroy(obstacle);
+        for (int i = 0; i < ClampedObstacles[0].Count; i++)
+        {
+            GameObject obs = ClampedObstacles[0][i];
+            Destroy(obs);
+        }
+        ClampedObstacles.RemoveAt(0);
+    }
+
+    private void SpawnSpike()
+    {
+        int objectToSpawn = (int)Random.Range(0, 2);
+        float spikeWidth = PrefabsArray[objectToSpawn].GetComponent<SpriteRenderer>().bounds.size.x;
+        int numberOfSpikes = (int)Random.Range(2, 6);
+        List<GameObject> gameObjects = new List<GameObject>();
+        float distance = Random.Range(minSpawnDistance, maxSpawnDistance);
+        SpawnVector.x += distance;
+
+        for (int i = 0; i < numberOfSpikes; i++)
+        {
+            objectToSpawn = Mathf.Clamp(objectToSpawn, 0, 2);
+            GameObject obstacle = Instantiate(PrefabsArray[objectToSpawn]) as GameObject;
+            obstacle.transform.parent = this.transform.parent;
+            SpawnVector.x += spikeWidth / 2;
+            obstacle.transform.position = SpawnVector;
+            gameObjects.Add(obstacle);
+        }
+
+        ClampedObstacles.Add(gameObjects);
+    }
     private void SpawnObstacle()
     {
         // Create and spawn object
@@ -88,12 +114,5 @@ public class ObstacleSpawner : MonoBehaviour
         //    obstacle.transform.position = SpawnVector;
         //    ActiveObstaclesList.Add(obstacle);
         //}
-    }
-
-    private void DeleteObstacle()
-    {
-        GameObject obstacle = ActiveObstaclesList[0];
-        Destroy(obstacle);
-        ActiveObstaclesList.RemoveAt(0);
     }
 }

@@ -6,15 +6,12 @@ using UnityEngine;
 public class RegenSpawner : MonoBehaviour
 {
     // Spawner stats
-    private int maxRegens = 5;
+    [SerializeField] private int maxRegens = 2;
     private float minRegenDistance;
     private float maxRegenDistance;
-    private float safeZone = 10f;
-
+    [SerializeField] private float safeZone = 10f;
     Vector3 SpawnVector = new Vector3(0, -1.5f, 0);
-
     public GameObject[] PrefabsArray = new GameObject[1];
-
     private List<GameObject> ActiveRegenList = new List<GameObject>();
 
     // Camera components
