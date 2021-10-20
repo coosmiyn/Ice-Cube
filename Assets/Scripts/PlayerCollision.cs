@@ -20,6 +20,9 @@ public class PlayerCollision : MonoBehaviour
     Rigidbody2D RigidBody;
     CharacterController2D CharacterController;
 
+    [SerializeField] MilkShake.Shaker shake;
+    [SerializeField] MilkShake.ShakePreset ShakePreset;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +39,7 @@ public class PlayerCollision : MonoBehaviour
         {
             if (!playerScript.isInvincible)
             {
+                FindObjectOfType<AudioManager>().Play("smash");
                 //// Add force and disable air control until it reaches the ground
                 //RigidBody.velocity = Vector3.zero;
                 //RigidBody.angularVelocity = 0.0f;
@@ -51,6 +55,9 @@ public class PlayerCollision : MonoBehaviour
                 playerScript.TakeDamage(spikeDamage);
                 RigidBody.AddForce(new Vector2(0, spikeForceY));
                 StartCoroutine(RegainAirControl(spikeDisableTime));
+
+                // do the harlem shake
+                shake.Shake(ShakePreset);
             }
         }
         else if (collision.gameObject.tag == "Ground")
@@ -72,7 +79,7 @@ public class PlayerCollision : MonoBehaviour
         switch(collision.tag)
         {
             case "RegenObject":
-                playerScript.hpLossRate = (playerScript.hpLossRate * -1) * regenRate;
+                playerScript.hpLossRate = (playerScript.defaultHpLossRate * -1) * regenRate;
                 break;
             case "PowerUpInvincible":
                 StartCoroutine(playerScript.TriggerPowerUp(EPowerUps.Invincible, 5.0f));
@@ -95,9 +102,10 @@ public class PlayerCollision : MonoBehaviour
         switch (collision.tag)
         {
             case "RegenObject":
-                playerScript.hpLossRate = (playerScript.hpLossRate * -1) / regenRate;
+                playerScript.hpLossRate = (playerScript.defaultHpLossRate * -1) / regenRate;
                 break;
             case "Fire":
+                FindObjectOfType<AudioManager>().Stop("fire");
                 //playerScript.hpLossRate = playerScript.defaultHpLossRate;
                 break;
         }
@@ -113,6 +121,7 @@ public class PlayerCollision : MonoBehaviour
     IEnumerator RegainHPRegen(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
+        FindObjectOfType<AudioManager>().Play("fire");
         playerScript.hpLossRate = playerScript.defaultHpLossRate;
     }
 

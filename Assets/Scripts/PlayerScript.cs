@@ -31,6 +31,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float randomMax { get; set; } = 80.0f;
     private float regenPoints { get; set; } = 0.0f;
     private bool _canSpawnRegenPowerUp { get; set; } = true;
+    [SerializeField] private float regenPointsTreshhold = 25.0f;
 
     // private vars
     private float _health { get; set; } = 100;
@@ -87,11 +88,16 @@ public class PlayerScript : MonoBehaviour
         if (canLoseHealth)
         {
             _health -= rate;
-            _health = Mathf.Clamp(health, 0, 100);
 
             //if (health <= 0)
             //    Die();
         }
+        else if (!canLoseHealth && rate < 0)
+        {
+            _health -= rate;
+        }
+
+        _health = Mathf.Clamp(health, 0, 100);
 
         if (rate > 0 && _health < 75 && _canSpawnRegenPowerUp)
         {
@@ -103,7 +109,7 @@ public class PlayerScript : MonoBehaviour
             regenPoints -= .075f;
         }
 
-        if (regenPoints > 25.0f && _canSpawnRegenPowerUp)
+        if (regenPoints > regenPointsTreshhold && _canSpawnRegenPowerUp)
         {
             _canSpawnRegenPowerUp = false;
             powerUpSpawnerScript.SpawnPowerUp(EPowerUps.Regen);

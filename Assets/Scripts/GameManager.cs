@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] public float scoringRate;
+    private float score = 0.0f;
+
     // Player Components
     GameObject Player;
     PlayerScript PlayerScript;
@@ -20,5 +23,14 @@ public class GameManager : MonoBehaviour
     {
         // Health drainer
         PlayerScript.ChangeHealth(PlayerScript.hpLossRate);
+
+        score += scoringRate;
+    }
+
+    // Return string HP for display
+    public string GetScore()
+    {
+        var scoreInt = (int)score;
+        return scoreInt.ToString();
     }
 }
